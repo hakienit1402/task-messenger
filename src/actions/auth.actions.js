@@ -1,20 +1,111 @@
 import {
-  getAuth,
-  signInWithEmailAndPassword,
   createUserWithEmailAndPassword,
+  GoogleAuthProvider,
   onAuthStateChanged,
+  signInWithEmailAndPassword,
+  signInWithPopup,
+  FacebookAuthProvider 
 } from "firebase/auth";
+import { doc, getDoc, onSnapshot, setDoc, updateDoc } from "firebase/firestore";
+import { auth, db } from "../firebase";
 import { authConstanst } from "./constants";
-import {
-  collection,
-  addDoc,
-  doc,
-  updateDoc,
-  setDoc,
-  getDoc,
-  onSnapshot,
-} from "firebase/firestore";
-import { db, auth } from "../firebase";
+
+export const signInWithFacebook = () => {
+  return async (dispatch) => {
+    dispatch({ type: `${authConstanst.USER_LOGIN}_REQUEST` });
+    const provider = new FacebookAuthProvider();
+    await signInWithPopup(auth, provider)
+      .then((result) => {
+        const userf = result.user;
+        console.log(userf)
+            setDoc(doc(db, "users", userf.uid), {
+              uid: userf.uid,
+              name: userf.displayName,
+              dayofbirth: "",
+              gender: "",
+              isOnline: true,
+              isChat: false,
+            })
+              .then(() => {
+                //success
+                const loggedInUser = {
+                  uid: userf.uid,
+                  name: userf.displayName,
+                  dayofbirth: "",
+                  gender: "",
+                  isOnline: true,
+                  isChat: false,
+                };
+
+                dispatch({
+                  type: `${authConstanst.USER_LOGIN}_SUCCESS`,
+                  payload: { user: loggedInUser },
+                });
+              })
+              .catch((error) => {
+                console.log(error);
+              });
+      })
+      .catch((error) => {
+        // Handle Errors here.
+        console.log(error);
+      });
+  };
+};
+
+export const signInWithGoogle = () => {
+  return async (dispatch) => {
+    dispatch({ type: `${authConstanst.USER_LOGIN}_REQUEST` });
+    const provider = new GoogleAuthProvider();
+    await signInWithPopup(auth, provider)
+      .then((result) => {
+        const userf = result.user;
+        getDoc(doc(db, "users", userf.uid)).then((docSnap) => {
+          if (docSnap.exists()) {
+            console.log("Document data:", docSnap.data());
+            dispatch({
+              type: `${authConstanst.USER_LOGIN}_SUCCESS`,
+              payload: { user: docSnap.data() },
+            });
+          } else {
+            console.log("No such document!");
+            setDoc(doc(db, "users", userf.uid), {
+              uid: userf.uid,
+              name: userf.displayName,
+              dayofbirth: "",
+              gender: "",
+              isOnline: true,
+              isChat: false,
+            })
+              .then(() => {
+                //success
+                const loggedInUser = {
+                  uid: userf.uid,
+                  name: userf.displayName,
+                  dayofbirth: "",
+                  gender: "",
+                  isOnline: true,
+                  isChat: false,
+                };
+
+                dispatch({
+                  type: `${authConstanst.USER_LOGIN}_SUCCESS`,
+                  payload: { user: loggedInUser },
+                });
+              })
+              .catch((error) => {
+                console.log(error);
+              });
+          }
+        });
+      })
+      .catch((error) => {
+        // Handle Errors here.
+        console.log(error);
+      });
+  };
+};
+
 export const signup = (params) => {
   return async (dispatch) => {
     dispatch({ type: `${authConstanst.USER_LOGIN}_REQUEST` });
@@ -44,8 +135,8 @@ export const signup = (params) => {
               isOnline: true,
               isChat: false,
             };
-            localStorage.setItem("authMess", true);
-            console.log("success: " + loggedInUser);
+            // localStorage.setItem("authMess", true);
+            // console.log("success: " + loggedInUser);
             dispatch({
               type: `${authConstanst.USER_LOGIN}_SUCCESS`,
               payload: { user: loggedInUser },

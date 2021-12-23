@@ -1,14 +1,17 @@
 /* eslint-disable jsx-a11y/anchor-is-valid */
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { FaFacebook } from "react-icons/fa";
 import {FcGoogle } from "react-icons/fc"
 import './auth.css'
 import { useDispatch, useSelector } from 'react-redux';
-import { signin, signup } from "../../actions";
+import { signin, signInWithFacebook, signInWithGoogle, signup } from "../../actions";
+import { Navigate } from "react-router-dom";
+
 
 const Auth = () => {
 
   const dispatch = useDispatch();
+  const auth = useSelector(state => state.auth);
     const [rightPanel,setRightPanel] = useState(" ");
     const [email,setEmail] = useState('');
     const [password,setPassword] = useState('')
@@ -26,7 +29,17 @@ const Auth = () => {
         dispatch(signin({email:account,password:pwdaccount}))
     }
   
+    const signInGoogle = () => {
+      dispatch(signInWithGoogle())
+    }
+   
+      if(auth.authenticated){
+        return <Navigate to="/"  />
+      }
   
+   const signInFacebook = () => {
+    dispatch(signInWithFacebook())
+   }
     return (
     <div className="main">
       <div className={`container  ${rightPanel}`} id="container">
@@ -34,11 +47,11 @@ const Auth = () => {
           <form onSubmit={signUp} >
             <h1>Create Account</h1>
             <div className="social-container">
-              <a href="#" className="social">
-                <FaFacebook color="blue"/>
+              <a className="social">
+                <FaFacebook color="blue"  onClick={signInFacebook}/>
               </a>
-              <a href="#" className="social">
-              <FcGoogle/>
+              <a className="social" >
+              <FcGoogle onClick={signInGoogle}/>
               </a>
             </div>
             <span>or use your email for registration</span>
@@ -70,11 +83,11 @@ const Auth = () => {
           <form onSubmit={signIn}>
             <h1>Sign in</h1>
             <div className="social-container">
-              <a href="#" className="social">
-              <FaFacebook color="blue"/>
+              <a  className="social">
+              <FaFacebook color="blue" onClick={signInFacebook}/>
               </a>
-              <a href="#" className="social">
-               <FcGoogle/>
+              <a className="social">
+               <FcGoogle onClick={signInGoogle}/>
               </a>
             </div>
             <span>or use your account</span>

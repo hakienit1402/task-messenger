@@ -14,7 +14,7 @@ const initState = {
 
 // eslint-disable-next-line import/no-anonymous-default-export
 export default (state = initState, action) => {
-  console.log(action);
+  // console.log(action);
 
   // eslint-disable-next-line default-case
   switch (action.type) {

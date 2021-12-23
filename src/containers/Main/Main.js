@@ -1,13 +1,16 @@
 import React, { useEffect, useState } from "react";
 import "./main.css";
+import { Navigate, useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from "react-redux";
 import {
   getRealtimeUsers,
   getRealtimeConversations,
   sendMessage,
+  logout,
 } from "../../actions";
 import InputEmoji from "react-input-emoji";
-import moment from 'moment'
+import moment from "moment";
+import { AiOutlineLogout } from "react-icons/ai";
 const ChatHeader = ({ name }) => {
   return (
     <div className="chat-header clearfix">
@@ -42,8 +45,10 @@ const ChatHistory = ({ conversations, uid }) => {
             {con.user_uid_1 === uid ? (
               <>
                 <div className="message-data text-right">
-                  <span className="message-data-time"> 
-                    {moment(new Date(con.createAt.seconds * 1000)).format('DD/MM/YYYY HH:MM')}
+                  <span className="message-data-time">
+                    {moment(new Date(con.createAt.seconds * 1000)).format(
+                      "DD/MM/YYYY HH:MM"
+                    )}
                   </span>
                 </div>
                 <div className="message other-message float-right">
@@ -58,7 +63,9 @@ const ChatHistory = ({ conversations, uid }) => {
                     alt="avatar"
                   />
                   <span className="message-data-time">
-                  {moment(new Date(con.createAt.seconds * 1000)).format('DD/MM/YYYY HH:MM')}
+                    {moment(new Date(con.createAt.seconds * 1000)).format(
+                      "DD/MM/YYYY HH:MM"
+                    )}
                   </span>
                 </div>
                 <div className="message my-message">{con.message}</div>
@@ -76,6 +83,7 @@ const ChatHistory = ({ conversations, uid }) => {
 // }
 const Main = () => {
   const dispatch = useDispatch();
+  const navigate = useNavigate();
   const auth = useSelector((state) => state.auth);
   const user = useSelector((state) => state.user);
   const [chatStarted, setChatStarted] = useState(false);
@@ -127,6 +135,13 @@ const Main = () => {
 
     //console.log(msgObj);
   };
+  const signout = () =>{
+    dispatch(logout(auth.uid))
+  }
+   
+  if(!auth.authenticated){
+    return <Navigate to="signin"  />
+  }
 
   return (
     <div className="container main-mess">
@@ -134,7 +149,24 @@ const Main = () => {
         <div className="col-lg-12">
           <div className="card chat-app">
             <div id="plist" className="people-list">
-              <div className="row header-list"></div>
+              <div className="row heading">
+                <div className="col-sm-2 col-xs-2 heading-avatar">
+                  <div className="heading-avatar-icon">
+                    <img src="https://bootdey.com/img/Content/avatar/avatar1.png" />
+                  </div>
+                </div>
+                <div className="col-sm-8 col-xs-8 text-truncate">
+                  {auth.name}
+                </div>
+                <div className="col-sm-1 col-xs-1  heading-dot  pull-right" onClick={signout}>
+                  <i
+                    className="fa fa-sign-out fa-2x  pull-right"
+                    aria-hidden="true"
+                  />
+                </div>
+                
+              </div>
+
               <ul className="list-unstyled chat-list mt-2 mb-0">
                 {user.users.length > 0
                   ? user.users.map((user) => (

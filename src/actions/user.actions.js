@@ -52,9 +52,9 @@ export const getRealtimeConversations = (user) => {
       querySnapshot.forEach((doc) => {
         console.log(doc.data())
         if(
-          (doc.data().user_uid_1 === user.uid_1 && doc.data().user_uid_2 == user.uid_2)
+          (doc.data().user_uid_1 === user.uid_1 && doc.data().user_uid_2 === user.uid_2)
           || 
-          (doc.data().user_uid_1 === user.uid_2 && doc.data().user_uid_2 == user.uid_1)
+          (doc.data().user_uid_1 === user.uid_2 && doc.data().user_uid_2 === user.uid_1)
       ){
         tmp.push(doc.data())
       }

@@ -1,9 +1,11 @@
 import React from 'react';
+import { useSelector } from 'react-redux';
 import { Navigate  } from 'react-router-dom';
+
 const PrivateRoute = ({children}) => {
-  const auth = localStorage.getItem('authMess') ? JSON.parse(localStorage.getItem('authMess')) : false;
+  const auth = useSelector((state) => state.auth);
   return(
-    auth ? children : <Navigate to='signin'/>
+    auth.authenticated ? children : <Navigate to='signin' replace/>
    )
 
  }

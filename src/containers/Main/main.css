@@ -1,6 +1,7 @@
 .main-mess{
     /* background-color: #f4f7f6; */
     margin-top:20px;
+    
 }
 .card {
     background: #fff;
@@ -22,6 +23,7 @@
 }
 
 .chat-app .chat {
+    min-height: 570px;
     margin-left: 280px;
     border-left: 1px solid #eaeaea
 }
@@ -32,13 +34,24 @@
     -webkit-transition: .5s;
     transition: .5s
 }
-.header-list{
+.heading{
     height: 65px;
     border-bottom: 1px solid rgb(231, 228, 228);
     padding: 10px;
     margin-bottom: 15px;
-    display: flex;
 }
+.heading-avatar {
+    padding: 0;
+    cursor: pointer;
+   
+  }
+  
+  .heading-avatar-icon img {
+    border-radius: 50%;
+    height: 50px;
+    width: 50px;
+    margin-top: -15px;
+  }
 
 .people-list .chat-list li {
     padding: 10px 15px;
