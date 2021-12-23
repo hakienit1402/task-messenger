@@ -179,7 +179,7 @@
 
 .chat .chat-history .other-message:after {
     border-bottom-color: #e8f1f3;
-    left: 93%
+    left: 70%
 }
 
 .chat .chat-message {
@@ -194,11 +194,11 @@
     vertical-align: middle
 }
 
-.online {
+.status .online {
     color: #86c541
 }
 
-.offline {
+.status .offline {
     color: #e47297
 }
 
@@ -220,54 +220,14 @@
 }
 
 .reply {
-    height: 60px;
+    height: 70px;
     width: 100%;
-    background-color: #f5f1ee;
+    background-color: #dfdcd9;
     padding: 10px 5px 10px 5px !important;
     margin: 0 !important;
     z-index: 1000;
   }
-  .reply-emojis i {
-    text-align: center;
-    padding: 5px 5px 5px 5px !important;
-    color: #93918f;
-    cursor: pointer;
-  }
-  
-  .reply-send {
-    /* padding: 5px !important; */
-  }
-  
-  .reply-send i {
-    text-align: center;
-    padding: 5px !important;
-    color: #93918f;
-    cursor: pointer;
-  }
-  
-  .reply-main {
-    padding: 2px 5px !important;
-  }
-  
-  .reply-main textarea {
-    width: 100%;
-    resize: none;
-    overflow: hidden;
-    padding: 5px !important;
-    outline: none;
-    border: none;
-    text-indent: 5px;
-    box-shadow: none;
-    height: 100%;
-    font-size: 16px;
-  }
-  
-  .reply-main textarea:focus {
-    outline: none;
-    border: none;
-    text-indent: 5px;
-    box-shadow: none;
-  }
+
 @media only screen and (max-width: 767px) {
     .chat-app .people-list {
         height: 465px;

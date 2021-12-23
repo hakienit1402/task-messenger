@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 import "./App.css";
+
 import Main from "./containers/Main/Main";
 import Auth from "./containers/SignUpSignInUI/Auth";
 import PrivateRoute from "./routes/PrivateRoute";
@@ -17,6 +18,7 @@ const App = () => {
             element={
               <PrivateRoute>
                 <Main />
+               
               </PrivateRoute>
             }
           />

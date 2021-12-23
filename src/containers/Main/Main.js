@@ -6,11 +6,8 @@ import {
   getRealtimeConversations,
   sendMessage,
 } from "../../actions";
-
-import { Dropdown } from "react-bootstrap";
-import { AiFillSetting } from "react-icons/ai";
-import { auth } from "../../firebase";
-
+import InputEmoji from "react-input-emoji";
+import moment from 'moment'
 const ChatHeader = ({ name }) => {
   return (
     <div className="chat-header clearfix">
@@ -36,43 +33,47 @@ const ChatHeader = ({ name }) => {
   );
 };
 
-const ChatHistory = ({ conversations,uid }) => {
+const ChatHistory = ({ conversations, uid }) => {
   return (
     <div className="chat-history">
       <ul className="m-b-0">
         {conversations.map((con, index) => (
           <li className="clearfix" key={index}>
-          {con.user_uid_1 ===uid ?
-          <>
-            <div className="message-data text-right">
-              <span className="message-data-time">{new Date(con.createAt.seconds*1000).toString()}</span>
-              <img
-                src="https://bootdey.com/img/Content/avatar/avatar1.png"
-                alt="avatar"
-              />
-            </div>
-            <div className="message other-message float-right">{con.message}</div>
-            </>
-          :
-          <>
-          <div className="message-data">
-            <span className="message-data-time">{new Date(con.createAt.seconds*1000).toString()}</span>
-          </div>
-          <div className="message my-message">{con.message}</div>
-          </>
-          }
-           
+            {con.user_uid_1 === uid ? (
+              <>
+                <div className="message-data text-right">
+                  <span className="message-data-time"> 
+                    {moment(new Date(con.createAt.seconds * 1000)).format('DD/MM/YYYY HH:MM')}
+                  </span>
+                </div>
+                <div className="message other-message float-right">
+                  {con.message}
+                </div>
+              </>
+            ) : (
+              <>
+                <div className="message-data">
+                  <img
+                    src="https://bootdey.com/img/Content/avatar/avatar1.png"
+                    alt="avatar"
+                  />
+                  <span className="message-data-time">
+                  {moment(new Date(con.createAt.seconds * 1000)).format('DD/MM/YYYY HH:MM')}
+                  </span>
+                </div>
+                <div className="message my-message">{con.message}</div>
+              </>
+            )}
           </li>
         ))}
 
-        <li className="clearfix">
-         
-        </li>
+        <li className="clearfix"></li>
       </ul>
     </div>
   );
 };
 
+// }
 const Main = () => {
   const dispatch = useDispatch();
   const auth = useSelector((state) => state.auth);
@@ -170,27 +171,18 @@ const Main = () => {
                 chatStarted ? (
                   <>
                     <ChatHeader name={chatUser} />
-                    <ChatHistory conversations={user.conversations} uid={auth.uid} />
+                    <ChatHistory
+                      conversations={user.conversations}
+                      uid={auth.uid}
+                    />
                     <div className="row reply">
-                      <div className="col-sm-1 col-xs-1 reply-emojis">
-                        <i className="fa fa-smile-o fa-2x" />
-                      </div>
-                      <div className="col-sm-9 col-xs-9 reply-main">
-                        <textarea
-                          className="form-control"
-                          rows={1}
-                          id="comment"
-                          value={message}
-                          onChange={(e) => setMessage(e.target.value)}
-                          placeholder="Write Message"
-                        />
-                      </div>
-                      <div
-                        className="col-sm-1 col-xs-1 reply-send"
-                        onClick={submitMessage}
-                      >
-                        <i className="fa fa-send fa-2x" aria-hidden="true" />
-                      </div>
+                      <InputEmoji
+                        value={message}
+                        onChange={setMessage}
+                        cleanOnEnter
+                        onEnter={submitMessage}
+                        placeholder="Type a message"
+                      />
                     </div>
                   </>
                 ) : null
