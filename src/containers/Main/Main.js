@@ -7,7 +7,7 @@ import {
   getRealtimeConversations,
   getRealtimeUsers,
   logout,
-  sendMessage
+  sendMessage,
 } from "../../actions";
 import "./main.css";
 const ChatHeader = ({ name }) => {
@@ -36,12 +36,14 @@ const ChatHeader = ({ name }) => {
 };
 
 const ChatHistory = ({ conversations, uid }) => {
-  // const convert =(mess) => {
-  //   var exp = /(\b(https?|ftp|file):\/\/[-A-Z0-9+&@#\/%?=~_|!:,.;]*[-A-Z0-9+&@#\/%=~_|])/ig;
-  //   var mess1=mess.replace(exp, "<a href='$1'>$1</a>");
-  //   var exp2 =/(^|[^\/])(www\.[\S]+(\b|$))/gim;
-  //   return mess1.replace(exp2, '$1<a target="_blank" href="http://$2">$2</a>')
-  // }
+  const convert = (mess) => {
+    var exp =
+      /(\b(https?|ftp|file):\/\/[-A-Z0-9+&@#\/%?=~_|!:,.;]*[-A-Z0-9+&@#\/%=~_|])/gi;
+    var mess1 = mess.replace(exp, "<a href='$1'>$1</a>");
+    var exp2 = /(^|[^\/])(www\.[\S]+(\b|$))/gim;
+    return mess1.replace(exp2, '$1<a target="_blank" href="http://$2">$2</a>');
+  };
+
   return (
     <div className="chat-history">
       <ul className="m-b-0">
@@ -55,7 +57,9 @@ const ChatHistory = ({ conversations, uid }) => {
                   </span>
                 </div>
                 <div className="message other-message float-right">
-                  {con.message}
+                  <div
+                    dangerouslySetInnerHTML={{ __html: convert(con.message) }}
+                  />
                 </div>
               </>
             ) : (
@@ -66,10 +70,14 @@ const ChatHistory = ({ conversations, uid }) => {
                     alt="avatar"
                   />
                   <span className="message-data-time">
-                  {new Date(con.createAt.seconds * 1000).toLocaleString()}
+                    {new Date(con.createAt.seconds * 1000).toLocaleString()}
                   </span>
                 </div>
-                <div className="message my-message">{con.message}</div>
+                <div className="message my-message">
+                  <div
+                    dangerouslySetInnerHTML={{ __html: convert(con.message) }}
+                  />
+                </div>
               </>
             )}
           </li>
@@ -150,7 +158,10 @@ const Main = () => {
               <div className="row heading">
                 <div className="col-sm-2 col-xs-2 heading-avatar">
                   <div className="heading-avatar-icon">
-                    <img src="https://bootdey.com/img/Content/avatar/avatar1.png" alt="#" />
+                    <img
+                      src="https://bootdey.com/img/Content/avatar/avatar1.png"
+                      alt="#"
+                    />
                   </div>
                 </div>
                 <div className="col-sm-8 col-xs-8 text-truncate">
