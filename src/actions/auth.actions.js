@@ -1,10 +1,8 @@
 import {
-  createUserWithEmailAndPassword,
-  GoogleAuthProvider,
+  createUserWithEmailAndPassword, FacebookAuthProvider, GoogleAuthProvider,
   onAuthStateChanged,
   signInWithEmailAndPassword,
-  signInWithPopup,
-  FacebookAuthProvider 
+  signInWithPopup
 } from "firebase/auth";
 import { doc, getDoc, onSnapshot, setDoc, updateDoc } from "firebase/firestore";
 import { auth, db } from "../firebase";
@@ -17,7 +15,19 @@ export const signInWithFacebook = () => {
     await signInWithPopup(auth, provider)
       .then((result) => {
         const userf = result.user;
-        console.log(userf)
+        getDoc(doc(db, "users", userf.uid)).then((docSnap) => {
+          if (docSnap.exists()) {
+            const userRef = doc(db, "users", userf.uid);
+            // console.log(userRef);
+            updateDoc(userRef, {
+              isOnline: true,
+            });
+            dispatch({
+              type: `${authConstanst.USER_LOGIN}_SUCCESS`,
+              payload: { user: docSnap.data() },
+            });
+          } else {
+            console.log("No such document!");
             setDoc(doc(db, "users", userf.uid), {
               uid: userf.uid,
               name: userf.displayName,
@@ -45,6 +55,8 @@ export const signInWithFacebook = () => {
               .catch((error) => {
                 console.log(error);
               });
+          }
+        });
       })
       .catch((error) => {
         // Handle Errors here.
@@ -60,9 +72,14 @@ export const signInWithGoogle = () => {
     await signInWithPopup(auth, provider)
       .then((result) => {
         const userf = result.user;
+        
         getDoc(doc(db, "users", userf.uid)).then((docSnap) => {
           if (docSnap.exists()) {
-            console.log("Document data:", docSnap.data());
+            const userRef = doc(db, "users", userf.uid);
+            // console.log(userRef);
+            updateDoc(userRef, {
+              isOnline: true,
+            });
             dispatch({
               type: `${authConstanst.USER_LOGIN}_SUCCESS`,
               payload: { user: docSnap.data() },
@@ -135,8 +152,6 @@ export const signup = (params) => {
               isOnline: true,
               isChat: false,
             };
-            // localStorage.setItem("authMess", true);
-            // console.log("success: " + loggedInUser);
             dispatch({
               type: `${authConstanst.USER_LOGIN}_SUCCESS`,
               payload: { user: loggedInUser },
@@ -148,9 +163,6 @@ export const signup = (params) => {
       })
       .catch((error) => {
         console.log(error);
-        const errorCode = error.code;
-        const errorMessage = error.message;
-        // ..
       });
   };
 };
