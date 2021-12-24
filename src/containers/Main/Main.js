@@ -1,8 +1,11 @@
+/* eslint-disable no-useless-escape */
 /* eslint-disable jsx-a11y/anchor-is-valid */
-import React, { useEffect, useState } from "react";
+import { async } from "@firebase/util";
+import React, { useEffect, useRef, useState } from "react";
 import InputEmoji from "react-input-emoji";
 import { useDispatch, useSelector } from "react-redux";
 import { Navigate } from "react-router-dom";
+import { checkText } from "smile2emoji";
 import {
   getRealtimeConversations,
   getRealtimeUsers,
@@ -10,6 +13,7 @@ import {
   sendMessage,
 } from "../../actions";
 import "./main.css";
+
 const ChatHeader = ({ name }) => {
   return (
     <div className="chat-header clearfix">
@@ -43,9 +47,13 @@ const ChatHistory = ({ conversations, uid }) => {
     var exp2 = /(^|[^\/])(www\.[\S]+(\b|$))/gim;
     return mess1.replace(exp2, '$1<a target="_blank" href="http://$2">$2</a>');
   };
+  useEffect(() => {
+    const objDiv = document.getElementById("chat-his");
+    objDiv.scrollTop = objDiv.scrollHeight;
+  }, [conversations]);
 
   return (
-    <div className="chat-history">
+    <div className="chat-history" id="chat-his">
       <ul className="m-b-0">
         {conversations.map((con, index) => (
           <li className="clearfix" key={index}>
@@ -58,7 +66,9 @@ const ChatHistory = ({ conversations, uid }) => {
                 </div>
                 <div className="message other-message float-right">
                   <div
-                    dangerouslySetInnerHTML={{ __html: convert(con.message) }}
+                    dangerouslySetInnerHTML={{
+                      __html: checkText(convert(con.message)),
+                    }}
                   />
                 </div>
               </>
@@ -87,7 +97,6 @@ const ChatHistory = ({ conversations, uid }) => {
   );
 };
 
-// }
 const Main = () => {
   const dispatch = useDispatch();
   const auth = useSelector((state) => state.auth);
@@ -97,7 +106,6 @@ const Main = () => {
   const [message, setMessage] = useState("");
   const [userUid, setUserUid] = useState(null);
   let unsubscribe;
-
   useEffect(() => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
     unsubscribe = dispatch(getRealtimeUsers(auth.uid))
@@ -114,16 +122,15 @@ const Main = () => {
       //cleanup
       unsubscribe.then((f) => f()).catch((error) => console.log(error));
     };
-  }, [unsubscribe]);
-  const initChat = (user) => {
-    console.log("z");
-    setChatStarted(true);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  const initChat = async (user) => {
     setChatUser(user.name);
     setUserUid(user.uid);
-
-    // console.log(user);
-
-    dispatch(getRealtimeConversations({ uid_1: auth.uid, uid_2: user.uid }));
+    setChatStarted(true);
+    sendMessage("");
+   await dispatch(getRealtimeConversations({ uid_1: auth.uid, uid_2: user.uid }))
   };
 
   const submitMessage = (e) => {
@@ -135,16 +142,21 @@ const Main = () => {
 
     if (message !== "") {
       dispatch(sendMessage(msgObj)).then(() => {
-        setMessage("");
-      });
+        setMessage(" ");
+      })
+      dispatch(getRealtimeConversations({ uid_1: auth.uid, uid_2: userUid }));
     }
-
-    //console.log(msgObj);
   };
   const signout = () => {
     dispatch(logout(auth.uid));
   };
-
+  const activeUser = (uid) => {
+    if (uid === userUid) {
+      return "clearfix active";
+    } else {
+      return "clearfix";
+    }
+  };
   if (!auth.authenticated) {
     return <Navigate to="signin" />;
   }
@@ -174,6 +186,7 @@ const Main = () => {
                   <i
                     className="fa fa-sign-out fa-2x  pull-right"
                     aria-hidden="true"
+                    style={{cursor:'pointer'}}
                   />
                 </div>
               </div>
@@ -182,7 +195,7 @@ const Main = () => {
                 {user.users.length > 0
                   ? user.users.map((user) => (
                       <li
-                        className="clearfix"
+                        className={activeUser(user.uid)}
                         onClick={() => initChat(user)}
                         key={user.uid}
                       >
@@ -210,27 +223,24 @@ const Main = () => {
               </ul>
             </div>
             <div className="chat">
-              {
-                chatStarted ? (
-                  <>
-                    <ChatHeader name={chatUser} />
-                    <ChatHistory
-                      conversations={user.conversations}
-                      uid={auth.uid}
+              {chatStarted ? (
+                <>
+                  <ChatHeader name={chatUser} />
+                  <ChatHistory
+                    conversations={user.conversations}
+                    uid={auth.uid}
+                  />
+                  <div className="row reply">
+                    <InputEmoji
+                      value={message}
+                      onChange={setMessage}
+                      cleanOnEnter
+                      onEnter={submitMessage}
+                      placeholder="Type a message"
                     />
-                    <div className="row reply">
-                      <InputEmoji
-                        value={message}
-                        onChange={setMessage}
-                        cleanOnEnter
-                        onEnter={submitMessage}
-                        placeholder="Type a message"
-                      />
-                    </div>
-                  </>
-                ) : null
-                //thêm cái hình vào đây hoặc design lời chào các kiểu
-              }
+                  </div>
+                </>
+              ) : null}
             </div>
           </div>
         </div>

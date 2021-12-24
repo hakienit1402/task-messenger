@@ -30,6 +30,7 @@ export const sendMessage = (msgObj) => {
       createAt: new Date()
     }).then((data)=>{
       console.log(data)
+      // dispatch(getRealtimeConversations({ uid_1: msgObj.user_uid_1, uid_2: msgObj.user_uid_2 }));
     }).catch(error=>{
       console.log(error)
     })
